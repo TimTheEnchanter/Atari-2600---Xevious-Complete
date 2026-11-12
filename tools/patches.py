@@ -62,3 +62,11 @@ FAR_3
 	STA    SEL0                  ; FFEF
 	.byte $00,$00,$00,$00,$00,$00 ; FFF2-FFF7 (FFF6/7 are F6 hotspots)
 """)
+patch('score table BCD','bank2_orig0.asm',
+"""DF958
+	.byte $00,$00,$00,$01,$01,$02,$03,$07
+	.byte $08,$0A,$14,$4B
+""","""DF958	; FIX: hundreds byte is BCD; prototype had decimal 10/20/75 typed as hex
+	.byte $00,$00,$00,$01,$01,$02,$03,$07
+	.byte $08,$10,$20,$75
+""")

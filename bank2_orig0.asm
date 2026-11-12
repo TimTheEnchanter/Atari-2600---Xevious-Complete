@@ -1329,9 +1329,9 @@ LF940
 DF94D
 	.byte $10,$30,$50,$00,$50,$00,$00,$00
 	.byte $00,$00,$00
-DF958
+DF958	; FIX: hundreds byte is BCD; prototype had decimal 10/20/75 typed as hex
 	.byte $00,$00,$00,$01,$01,$02,$03,$07
-	.byte $08,$0A,$14,$4B
+	.byte $08,$10,$20,$75
 LF964
 	LSR                          ; F964
 	LSR                          ; F965
@@ -1985,6 +1985,7 @@ FAR_2
 FAR_3
 	STA    SEL0                  ; FFEF
 	.byte $00,$00,$00,$00,$00,$00 ; FFF2-FFF7 (FFF6/7 are F6 hotspots)
+; end free FFE5
 ; bankswitch hotspots / vectors
 	.byte $00,$00
 	.byte $00,$00,$00,$F0,$00,$F0
