@@ -58,8 +58,8 @@ FAR_1
 	STA    SEL0                  ; FFE9
 FAR_2
 	STA    SEL0                  ; FFEC
-FAR_3
-	STA    SEL0                  ; FFEF
+FAR_KERNEL
+	STA    SEL1                  ; FFEF  -> bank 1 kernel (lands at $FFF2)
 	.byte $00,$00,$00,$00,$00,$00 ; FFF2-FFF7 (FFF6/7 are F6 hotspots)
 """)
 patch('score table BCD','bank2_orig0.asm',
@@ -69,4 +69,9 @@ patch('score table BCD','bank2_orig0.asm',
 ""","""DF958	; FIX: hundreds byte is BCD; prototype had decimal 10/20/75 typed as hex
 	.byte $00,$00,$00,$01,$01,$02,$03,$07
 	.byte $08,$10,$20,$75
+""")
+
+patch('run kernel from bank 1','bank2_orig0.asm',
+"""	JMP    $B006                 ; F0C1
+""","""	JMP    FAR_KERNEL            ; F0C1  M3: kernel now runs from bank 1
 """)

@@ -27,7 +27,7 @@ FARRET0	STA    SEL2                  ; -> bank 2 continues at $FFE5 (RTS)
 	JMP    AndorPage             ; FFE9 = FAR_ANDORPAGE+3
 	JMP    FARRET0               ; FFEC = FAR_1+3 (unused)
 	JMP    FARRET0               ; FFEF = FAR_2+3 (unused)
-	JMP    FARRET0               ; FFF2 = FAR_3+3 (unused)
+	.byte  0,0,0                 ; FFF2 (bank 1 landing, not bank 0)
 	ORG $0FFC
 	RORG $FFFC
 	.word $F000,$F000

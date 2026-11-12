@@ -122,7 +122,7 @@ LF09E
 .fast
 	STA    $E7
 	NOP                          ; pad: keeps original layout
-	JMP    $B006                 ; F0C1
+	JMP    FAR_KERNEL            ; F0C1  M3: kernel now runs from bank 1
 LF0C4
 	STA    WSYNC                 ; F0C4
 	LDX    #$FF                  ; F0C6
@@ -1982,8 +1982,8 @@ FAR_1
 	STA    SEL0                  ; FFE9
 FAR_2
 	STA    SEL0                  ; FFEC
-FAR_3
-	STA    SEL0                  ; FFEF
+FAR_KERNEL
+	STA    SEL1                  ; FFEF  -> bank 1 kernel (lands at $FFF2)
 	.byte $00,$00,$00,$00,$00,$00 ; FFF2-FFF7 (FFF6/7 are F6 hotspots)
 ; end free FFE5
 ; bankswitch hotspots / vectors

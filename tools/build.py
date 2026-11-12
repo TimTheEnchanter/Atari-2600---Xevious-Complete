@@ -13,5 +13,6 @@ for name,f,old,new in P:
     assert files[f].count(old)==1, 'patch failed: '+name
     files[f]=files[f].replace(old,new)
 for f,t in files.items(): open(S+'/'+f,'w').write(t)
+subprocess.run(['python3','-I','/home/claude/tools/mkbank1.py'],check=True)
 r=subprocess.run(['/home/claude/dasm/bin/dasm','xevious16k.asm','-f3','-o../xevious16k.a26','-l../xevious16k.lst','-s../xevious16k.sym'],cwd=S,capture_output=True,text=True)
 print(r.stdout[-300:],r.stderr[-300:]); print('size',os.path.getsize(X+'/xevious16k.a26'))
