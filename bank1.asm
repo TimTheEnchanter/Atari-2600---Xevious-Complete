@@ -250,15 +250,15 @@ KLB20F
 KLB212
 	JMP    KLB226                 ; B212
 KLB215
-	INC    $E7                   ; B215
-	INC    $E7                   ; B217
+	INC    $2D                   ; B215
+	INC    $2D                   ; B217
 	JMP    KLB226                 ; B219
 KLB21C
-	INC    $E7                   ; B21C
-	INC    $E7                   ; B21E
-	DEC    $E7                   ; B220
-	DEC    $E7                   ; B222
-	STA    $E7                   ; B224
+	INC    $2D                   ; B21C
+	INC    $2D                   ; B21E
+	DEC    $2D                   ; B220
+	DEC    $2D                   ; B222
+	STA    $2D                   ; B224
 KLB226
 	LDA    $F7                   ; B226
 	LDX    $F9                   ; B228
@@ -306,7 +306,7 @@ KLB251
 	TAY                          ; B27E
 	LDA    KDBBC9,Y               ; B27F
 	STA    $F8                   ; B282
-	JMP    $F006                 ; B284
+	JMP    $BDB0                 ; B284 -> POSTK (shipk.asm)
 KLB287
 	JMP    KLB251                 ; B287
 KLB28A
@@ -322,8 +322,9 @@ KLB29A
 	LDA    $BB,X                 ; B29C
 	CMP    $E5                   ; B29E
 	BCS    KLB2A7                 ; B2A0
-	LDA    #$B0                  ; B2A2
-	JMP    KLB2C2                 ; B2A4
+	JMP    $BDC4                 ; B2A2 -> SHIPDET (shipk.asm)
+	NOP
+	NOP
 KLB2A7
 	BIT    $31                   ; B2A7
 	BMI    KLB2AD                 ; B2A9

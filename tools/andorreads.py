@@ -1,7 +1,7 @@
 import sys; sys.path.insert(0,'/home/claude/tools')
 import emu
 from emu import Emu
-rom=open(sys.argv[1],'rb').read(); nb=len(rom)//4096; kb=nb-1  # kernel bank = last
+rom=open(sys.argv[1],'rb').read(); nb=len(rom)//4096; kb=1 if nb==4 else nb-1  # kernel bank
 log=[]
 G=emu.Bus.__getitem__
 def g(s,a):

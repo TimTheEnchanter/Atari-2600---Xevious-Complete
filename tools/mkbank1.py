@@ -14,4 +14,11 @@ new_free="""KFREE_BFB4	; ---- unused space (68 bytes) ----
 ; end free BFB4
 """
 t=t.replace(old_free,new_free)
+# ship band hook + move Tod's junk timing RMWs off $E7 (now a span variable) to unused TIA $2D
+t=t.replace('\tLDA    #$B0                  ; B2A2\n\tJMP    KLB2C2                 ; B2A4\n','\tJMP    $BDC4                 ; B2A2 -> SHIPDET (shipk.asm)\n\tNOP\n\tNOP\n')
+for a in ('B215','B217','B21C','B21E','B220','B222','B224'):
+    t=re.sub(r'(\t(?:INC|DEC|STA)\s+)\$E7(\s+; '+a+')',r'\g<1>$2D\2',t)
+t=t.replace('\tJMP    $F006                 ; B284','\tJMP    $BDB0                 ; B284 -> POSTK (shipk.asm)')
+assert 'JMP    $BDB0' in t
+assert 'JMP    $BDC4' in t and t.count('$2D ')+t.count('$2D\t')>=1
 open(S+'bank1.asm','w').write(t)

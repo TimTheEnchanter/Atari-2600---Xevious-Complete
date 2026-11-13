@@ -623,8 +623,8 @@ LF424
 	LDX    $B3                   ; F439
 	LDA    DF414,X               ; F43B
 	STA    $EF                   ; F43E
-	JSR    FAR_ANDORPAGE         ; F440  FIX: core frame at $BF0B was read from $BE0B
-	NOP                          ; F443
+	LDX    #$BE                  ; F440
+	STX    $F0                   ; F442
 	LDA    #$00                  ; F444
 	STA    $F8                   ; F446
 	LDA    DFA38                 ; F448
@@ -812,8 +812,8 @@ LF572
 	JSR    LF5BB                 ; F5A4
 	LDA    #$00                  ; F5A7
 	STA    HMM0                  ; F5A9
-	LDA    #$47                  ; F5AB
-	STA    $DF                   ; F5AD
+	JSR    FAR_2                 ; F5AB  ship pre-kernel (bank 0 ShipPre; also does $DF=#$47)
+	NOP                          ; F5AE
 	LDA    $DE                   ; F5AF
 	STA    $E0                   ; F5B1
 	JMP    LF09E                 ; F5B3
@@ -1008,14 +1008,17 @@ LF6F1
 	LDY    #$03                  ; F706
 	JSR    $B018                 ; F708
 LF70B
-	BIT    $31                   ; F70B
-	BPL    LF770                 ; F70D
-	LDX    $E2                   ; F70F
-	LDA    $A7,X                 ; F711
-	CMP    #$44                  ; F713
-	BCS    LF770                 ; F715
-	LDX    $E3                   ; F717
-	BNE    LF73B                 ; F719
+	JSR    FAR_1                 ; F70B  bank 0 Coll: C=1 none, else X=0 ship hit / X>0 shot
+	BCS    LF770                 ; F70E
+	TXA                          ; F710
+	BNE    LF73B                 ; F711
+	JMP    LF71B                 ; F713
+	NOP
+	NOP
+	NOP
+	NOP
+	NOP
+LF71B
 	LDA    $97                   ; F71B
 	BNE    LF770                 ; F71D
 	LDA    $91                   ; F71F
@@ -1332,34 +1335,16 @@ DF94D
 DF958	; FIX: hundreds byte is BCD; prototype had decimal 10/20/75 typed as hex
 	.byte $00,$00,$00,$01,$01,$02,$03,$07
 	.byte $08,$10,$20,$75
+; Score add moved to bank 0 (ScoreAdd): arcade extra lives at 20,000 then every 60,000
+; (the prototype gave one every 10,000). C=1 on return -> play Tod's extra-life jingle.
 LF964
-	LSR                          ; F964
-	LSR                          ; F965
-	LSR                          ; F966
-	LSR                          ; F967
-	TAY                          ; F968
-	LDA    $91                   ; F969
-	BMI    LF98E                 ; F96B
-	SED                          ; F96D
-	CLC                          ; F96E
-	LDA    $8A                   ; F96F
-	ADC    DF94D,Y               ; F971
-	STA    $8A                   ; F974
-	LDA    $89                   ; F976
-	ADC    DF958,Y               ; F978
-	STA    $89                   ; F97B
-	BCC    LF987                 ; F97D
-	LDY    #$07                  ; F97F
-	JSR    $B018                 ; F981
-	INC    $85                   ; F984
-	SEC                          ; F986
-LF987
-	LDA    $88                   ; F987
-	ADC    #$00                  ; F989
-	STA    $88                   ; F98B
-	CLD                          ; F98D
+	JSR    FAR_SCORE             ; F964
+	BCC    LF98E
+	LDY    #$07
+	JSR    $B018
 LF98E
-	RTS                          ; F98E
+	RTS
+	DS.B   $F98F-$F96F, $00      ; freed: F96F-F98E
 LF98F
 	LDA    $91                   ; F98F
 	BPL    LF9A0                 ; F991
@@ -1976,7 +1961,7 @@ DFF81
 ; with JMP to the routine; it returns via FARRET0 (STA SEL2 at $FFE2), landing
 ; on the RTS at $FFE5 below.
 	RTS                          ; FFE5  far-call return landing
-FAR_ANDORPAGE
+FAR_SCORE
 	STA    SEL0                  ; FFE6
 FAR_1
 	STA    SEL0                  ; FFE9

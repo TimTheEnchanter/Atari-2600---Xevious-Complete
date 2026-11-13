@@ -15,4 +15,9 @@ for name,f,old,new in P:
 for f,t in files.items(): open(S+'/'+f,'w').write(t)
 subprocess.run(['python3','-I','/home/claude/tools/mkbank1.py'],check=True)
 r=subprocess.run(['/home/claude/dasm/bin/dasm','xevious16k.asm','-f3','-o../xevious16k.a26','-l../xevious16k.lst','-s../xevious16k.sym'],cwd=S,capture_output=True,text=True)
+r2=subprocess.run(['/home/claude/dasm/bin/dasm','shipk.asm','-f3','-oshipk.bin','-sshipk.sym'],cwd=S,capture_output=True,text=True); assert 'Complete' in r2.stdout, r2.stdout
+rom=bytearray(open(X+'/xevious16k.a26','rb').read()); ov=open(S+'/shipk.bin','rb').read(); assert len(ov)<=0x1E7
+rom[0x1D00:0x1D00+len(ov)]=ov
+r3=subprocess.run(['/home/claude/dasm/bin/dasm','shiptab.asm','-f3','-oshiptab.bin'],cwd=S,capture_output=True,text=True); assert 'Complete' in r3.stdout, r3.stdout
+tb=open(S+'/shiptab.bin','rb').read(); assert len(tb)==60; rom[0x1960:0x1960+60]=tb; open(X+'/xevious16k.a26','wb').write(rom)
 print(r.stdout[-300:],r.stderr[-300:]); print('size',os.path.getsize(X+'/xevious16k.a26'))
