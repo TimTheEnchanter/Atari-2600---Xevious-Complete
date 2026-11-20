@@ -6,6 +6,8 @@
 SFLG=$B960
 SRA=$B974
 SRB=$B988
+SCOL=$B99C
+COLUP1=$07
 WSYNC=$02
 HMOVE=$2A
 GRP1=$1C
@@ -70,9 +72,7 @@ SB334B	DEC $A1
 	ORG $BD7B
 SL0	DEC $A1
 	BMI SL0_row
-	INC $E4
-	LDA #$7B
-	JMP SPANTAIL
+	JMP SL0_col		; plain L0 line: ship row colour (M5), then Tod's tail
 SL0_row	LDX #$02
 	LDY $9F
 	LDA ($A2),Y
@@ -126,6 +126,13 @@ SHIPDET_hide	LDA $E8
 	JMP $B2C2
 
 	ECHO "BD page end:", *
+	ORG $BDF0
+SL0_col	INC $E4			; @26: per-row ship colour from SCOL[$E9] (COLUP1 is shared with
+	LDY $E9			; the ground objects, so ROW5 restores Tod's grey after the band)
+	LDA SCOL,Y
+	STA COLUP1		; @36
+	LDA #$7B
+	JMP SPANTAIL		; SPANTAIL's WSYNC lands by cycle 68
 
 	ORG $BE00
 SHIPPOS	STA RESP1		; @28; coarse 0-3 in $E8 bits 0-1 (fine in bits 4-7)
@@ -196,12 +203,19 @@ ROW5	LDA $0284
 	BCC KEND
 	LDA #$25
 	STA NUSIZ1		; back to Tod's double-width ground objects
+	LDA #$08
+	STA COLUP1		; and Tod's ground-object grey (M5)
 	LDA #$B3
 	STA $DA
 	LDA #<ROW6
 	STA $DB
-	LDX #0
-	JMP L2TAIL
+	INC $E5			; L2TAIL inlined: saves the JMP and LDX #0 (5 cycles),
+	LDA #0			; paying for the COLUP1 restore. Worst case is Tod's again
+	STA WSYNC		; (store done by cycle 73 on the latest entry).
+	STA HMOVE
+	STA ENAM0
+	STA GRP1
+	JMP ($00DF)
 ROW6	BIT CXPPMM
 	BPL ROW6_n
 	BIT $E8

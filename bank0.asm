@@ -1,6 +1,7 @@
 ;======================================================================
 ; BANK 0 (new code)
 ;======================================================================
+TODAI	= 0		; 1 = Tod's family AI (port check)
 	SEG bank0
 	ORG $0000
 	RORG $F000
@@ -202,6 +203,48 @@ Coll SUBROUTINE
 .none	SEC
 	JMP    FARRET0
 
+	include air.asm
+	include title.asm
+
+;----------------------------------------------------------------------
+; FAR_2 is shared: the caller is told apart by the low byte of its return
+; address on the stack (JSR pushes ret-1; $01xx mirrors RAM on the 2600).
+;   $F5AB JSR FAR_2 (pre-kernel) -> ShipPre;  $F3D0 JSR FAR_2 -> AirLoop;
+;   TitleGo ($F3D6) JSR FAR_2 -> Title
+Far2	TSX
+	LDA    $0101,X
+	CMP    #$AD                  ; <($F5AB+2)
+	BNE    .t
+	JMP    ShipPre
+.t	CMP    #<(TitleGo+2)         ; bank 2 TitleGo -> Title (whole frames)
+	BNE    .air
+	JMP    Title
+.air	JMP    AirLoop
+
+;----------------------------------------------------------------------
+; air handler entry page (HndLo holds the low bytes)
+	ORG $0F00
+	RORG $FF00
+HJmp
+J_None	JMP    Anim
+J_Launch JMP   H_Launch
+J_Mark	JMP    H_Mark
+J_2F	JMP    H_2F
+J_30	JMP    H_30
+J_Move	JMP    H_Move
+J_Aim	JMP    H_Aim
+J_Zoshi	JMP    H_Zoshi
+J_Tork	JMP    H_Tork
+J_Toroid JMP   H_Toroid
+J_Kapi	JMP    H_Kapi
+J_Jara	JMP    H_Jara
+ IF TODAI
+J_TTurn	JMP    T_Turn
+J_TMv	JMP    T_Mv
+J_TSpin	JMP    T_Spin
+J_TBomb	JMP    T_Bomb
+ ENDIF
+
 ;----------------------------------------------------------------------
 ; far-call landing pads (must line up with bank 2's slots at $FFE5..)
 	ORG $0FE2
@@ -211,7 +254,7 @@ FARRET0	STA    SEL2                  ; -> bank 2 continues at $FFE5 (RTS)
 	.byte  $00,$00,$00           ; FFE6 (bank 2's STA SEL0)
 	JMP    ScoreAdd              ; FFE9 = FAR_SCORE+3
 	JMP    Coll                  ; FFEC = FAR_1+3
-	JMP    ShipPre               ; FFEF = FAR_2+3
+	JMP    Far2                  ; FFEF = FAR_2+3 (ShipPre / AirLoop)
 	.byte  0,0,0                 ; FFF2 (bank 1 landing, not bank 0)
 	ORG $0FFC
 	RORG $FFFC
